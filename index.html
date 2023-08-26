@@ -1,0 +1,504 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="https://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
+<script type="text/javascript" src="https://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+      </script>
+      <script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+      </script>
+
+
+</head>
+
+<body>
+
+<h1>Orthogonal Vectors and CDMA</h1>
+
+<p>This website introduces the projection on orthogonal base vectors and the mechanism of CDMA (Code Division Multiple Access). 
+        We're assuming that you have basic knowledge on linear algebra, especially knowing the concept of vector, vector multiplication, and basis.</p>
+
+<p>If you're interested in mobile phones, you should have been heard the concept of CDMA, which was once a popular 
+        technology of network. Indeed, the 3G network is based on CDMA. The idea of CDMA is that if we assign different orthogonal basis to channels, and 
+        use them to encode the message, then we can recover each message by the basis. This fact results from the property of orthogonal vectors.
+</p>
+
+
+<h2>Projection</h2>
+
+<p>Before we introduce the concept of projection, we first review the idea of inner product.</p>
+
+<p><b>Inner multiplication</b> of vectors is defined as: </p>
+<center><p>$a = \begin{pmatrix} a_1\\a_2\\ \dots \\ a_n \end{pmatrix}$ and $b=\begin{pmatrix} b_1\\b_2\\ \dots \\ b_n \end{pmatrix}$, then we have  $a \cdot b=\sum a_ib_i =a_1b_1+a_2b_2+\dots +a_nb_n$.</p></center>
+
+<p>Note that the result of inner product is a scaler. The above definition is the math definition, and we can use another way to calculate the inner product. </p>
+<center><p>Let $|a|=\sqrt{\sum a_i^2}$ the length of $a$, and $\theta$ be the angle between $a$ and $b$, the inner product is defined by: $a\cdot b =|a|*|b|*\cos(\theta)$.</p></center>
+
+<p>From the definition, we can figure out the meaning easily. The inner product shows the effect of two vectors on the direction of one vector. 
+        Indeed, many common variables in physical world are defined by inner product, such as work $W=F\cdot s$.</p>
+
+<p><b>Projection</b> measures the component of a vector on a given direction. We can calculate the projection by simply set the length of direction vector $b$ to $1$ and times $b$ for direction. Note that the inner product is a scaler, so we need to times $b$ for direction.</p>
+
+<center><p>The projection of $a$ on $b = \frac{a\cdot b}{|b|}*\frac{b}{|b|}$.</p></center>
+
+<p>We will attach a plot latter for you to have a deeper understanding in projection. In order to save space, it will be presented after we introduce the orthogonal basis.</p>
+
+<h2>Orthogonal Basis</h2>
+<p>A group of vectors $\{a_1,a_2,\dots,a_n\}$ is said to be <b> orthogonal</b> if: </p>
+<center><p>1) $\forall i=j,~~a_i\cdot a_j=1$,</p></center>
+<center><p>2) $\forall i\neq j,~~a_i\cdot a_j=0$.</p></center>
+
+<p>In the coordinate system, the x,y axis are a group of orthogonal basis. Here is a interactive graph for you to get familiar to the projection on orthogonal basis. The black vectors are the basis, the red vectors are the projection of blue vector onto the basis. You can drag the blue vector, and rotate the basis using the slider.</p>
+
+<!-- the first projection 2D chart -->
+<center><div id="jxgbox" class="jxgbox" style="width:500px; height:500px;"></div></center>
+<script type="text/javascript">
+JXG.Options.text.useMathJax = true;
+var b1 = JXG.JSXGraph.initBoard('jxgbox', {boundingbox:[-4,4,4,-4], axis:true});
+b1.suspendUpdate();
+// var a = b1.create('slider',[[-5,-2],[5,-2],[-5,1,5]],{name:'a', snapWidth:0.1});
+// var b = b1.create('slider',[[-5,-3],[5,-3],[-5,0,5]],{name:'b', snapWidth:0.1});
+// var c = b1.create('slider',[[-5,-4],[5,-4],[-5,0,5]],{name:'c', snapWidth:0.1});
+// var d = b1.create('slider',[[-5,-5],[5,-5],[-5,1,5]],{name:'d', snapWidth:0.1});
+
+var base_angle = b1.create('slider',[[-1.5,-1.5],[1.5,-1.5],[0,0,360]],{name:'base angle in degree', snapWidth:5})
+// var vector_angle = b1.create('slider',[[-5,-4],[5,-4],[0,45,360]],{name:'vector_angle',snapWidth:5})
+// var vector_coefficient = b1.create('slider',[[-5,-5],[5,-5],[0,1,5]],{name:'vector_coefficient',snapWidth:0.5})
+
+// var vector = b1.create('point',[vector_coefficient.Value()*Math.cos(Math.PI*vector_angle.Value()/180),vector_coefficient.Value()*Math.sin(Math.PI*vector_angle.Value()/180)],{face:'o', size:2, name:'vector'});
+
+// the vector, allowing to drag
+var vector = b1.create('point', [2.0,2.0],{face:'o', size:1.25, name:'vector', strokeColor:'red'});
+var vectora = b1.create('arrow',[[0,0],vector],{strokeColor:'blue', strokeWidth:3.5});
+
+// the base
+var base_1 = b1.create('point',[
+        function(){return Math.cos(Math.PI * base_angle.Value()/180);},
+        function(){return Math.sin(Math.PI * base_angle.Value()/180);}
+], {face:'o', size:0, name:"base 1", fillColor: 'black', strokeColor: 'black'});
+var base_1a = b1.create('arrow',[[0,0],base_1],{strokeColor:'black', strokeWidth:3});
+
+var base_2 = b1.create('point',[
+        function(){return Math.cos(Math.PI * (base_angle.Value()+90)/180);},
+        function(){return Math.sin(Math.PI * (base_angle.Value()+90)/180);}
+], {face:'o', size:0, name:"base 2", fillColor: 'black', strokeColor: 'black'});
+var base_2a = b1.create('arrow',[[0,0],base_2],{strokeColor:'black', strokeWidth:3});
+
+// the projection
+var pro_1 = b1.create('point',[
+        function(){return Math.cos(Math.PI * (base_angle.Value())/180)*(Math.cos(Math.PI * base_angle.Value()/180)*vector.X()+Math.sin(Math.PI * base_angle.Value()/180)*vector.Y());},
+        function(){return Math.sin(Math.PI * (base_angle.Value())/180)*(Math.cos(Math.PI * base_angle.Value()/180)*vector.X()+Math.sin(Math.PI * base_angle.Value()/180)*vector.Y());}
+], {face:'o', size:0, name:"projection 1", fillColor: 'red', strokeColor: 'red'});
+var pro_1a = b1.create('arrow',[[0,0],pro_1],{strokeColor:'red', strokeWidth:2.5});
+
+var pro_2 = b1.create('point',[
+        function(){return Math.cos(Math.PI * (base_angle.Value()+90)/180)*(Math.cos(Math.PI * (base_angle.Value()+90)/180)*vector.X()+Math.sin(Math.PI * (base_angle.Value()+90)/180)*vector.Y());},
+        function(){return Math.sin(Math.PI * (base_angle.Value()+90)/180)*(Math.cos(Math.PI * (base_angle.Value()+90)/180)*vector.X()+Math.sin(Math.PI * (base_angle.Value()+90)/180)*vector.Y());}
+], {face:'o', size:0, name:"projection 2", fillColor: 'red', strokeColor: 'red'});
+var pro_2a = b1.create('arrow',[[0,0],pro_2],{strokeColor:'red', strokeWidth:2.5});
+
+// the green line parallel
+var li = b1.create('line',[vector,pro_1],{straightFirst:false, straightLast:false, strokeWidth:2, dash:2, strokeColor:'green'})
+
+
+// var v2 = b1.create('point',[
+//      function() {return a.Value()*v.X()+b.Value()*v.Y();},
+//      function() {return c.Value()*v.X()+d.Value()*v.Y();}],{face:'o', size:2, name:"v'", fillColor: 'black', strokeColor: 'black'});
+
+// var va2 = b1.create('arrow',[[0,0],v2],{strokeColor:'black', strokeWidth:1});
+
+
+
+// var t2 = b1.create('text',[-8,2,
+//              function(){ return "\\[\\lambda = \\frac{|v'|}{|v|} = " 
+//                + (
+//                    JXG.Math.Geometry.distance([0,0],[v2.X(),v2.Y()])/
+//                    JXG.Math.Geometry.distance([0,0],[v.X(),v.Y()])
+//                  ).toFixed(3) 
+//                  + "\\]";} ]);
+
+
+b1.unsuspendUpdate();
+
+showTrace = false;
+var toggleTrace = function() {
+showTrace = !showTrace;
+vector.setProperty({trace: showTrace});
+//v2.setProperty({trace: showTrace});
+var b = document.getElementById("toggleButton");
+if (showTrace) {
+   b.value = "Hide trace";
+} else {
+   b.value = "Show trace";
+   vector.clearTrace();
+  // v2.clearTrace();
+}
+};
+</script>
+
+<p>From the graph, we can see that the two projections are always perpendicular to each other. This fact still holds when the basis is not the x,y axis.</p>
+<p>Our initial purpose is to develop a way for us to recover each coefficient from mixed vector. In the condition of the graph, we can see that at least in 2-D, the coefficients can be recovered when the basis are orthogonal. Here we use math to derive it.</p>
+
+<center>
+<p>If $\{a_1,a_2,\dots,a_n\}$ are a group of orthogonal basis, then every vector can be represented as $v=\sum c_i a_i$ where $c_i$ is the corresponding vector. </p>
+<p>$a_j*v = \sum c_i a_i a_j = c_j$  due to the property of orthogonal vector.</p>
+</center>
+
+<p>Hereby, we can recover the corresponding coefficient $c_j$ by multiplying the basis $a_j$ to the mixed vector.</p>
+
+
+<h2>CDMA</h2>
+<p>CDMA actually is an application of the property of the projection on orthogonal basis. It's easy to understand CDMA with that knowledge.</p>
+
+<p>Multiplexing is a technology allows different terminals using the channel between stations, where CDMA, TDMA and FDMA are typically used to achieve multiplexing. 
+        The idea of CDMA is to sum the signals sent by different terminals into one mixed signal for transmission. 
+        We have showed that using orthogonal basis can achieve the aim to recover signals from combined signals.</p>
+
+<p>We first set a group of orthogonal basis as <b>channel code</b> and assign to stations. For each message sent to a given station, encode the message by multiply the channel code. All the stations can directly send the encoded signals to the channel and sum up on other stations. In the decode process, we just multiply the corresponding channel code again.</p>
+
+<p>Here's a interactive graph for you to have a deeper insight into the CDMA system. You can change the slide from by 0 and 1 as the input signal. </p>
+
+<!-- the second CDMA chart -->
+<center>
+<tr><td>Channel 1 Base: </td><td></td><input type="number" id="channel_11" value=0.5 step=0.05 max=1 min=-1><input type="number" id="channel_12" value=0.5 step=0.05 max=1 min=-1><input type="number" id="channel_13" value=0.5 step=0.05 max=1 min=-1><input type="number" id="channel_14" value=0.5 step=0.05 max=1 min=-1></td></tr>
+<p></p>
+<tr><td>Channel 2 Base: </td><td></td><input type="number" id="channel_21" value=0.5 step=0.05 max=1 min=-1><input type="number" id="channel_22" value=0.5 step=0.05 max=1 min=-1><input type="number" id="channel_23" value=-0.5 step=0.05 max=1 min=-1><input type="number" id="channel_24" value=-0.5 step=0.05 max=1 min=-1></td></tr>
+<p></p>
+<tr><td>Channel 3 Base: </td><td></td><input type="number" id="channel_31" value=0.5 step=0.05 max=1 min=-1><input type="number" id="channel_32" value=-0.5 step=0.05 max=1 min=-1><input type="number" id="channel_33" value=-0.5 step=0.05 max=1 min=-1><input type="number" id="channel_34" value=0.5 step=0.05 max=1 min=-1></td></tr>
+
+
+<div id="jxgbox2" class="jxgbox" style="width:1050px; height:600px;"></div>
+</center>
+<script type="text/javascript">
+
+JXG.Options.text.useMathJax = true;
+
+//the board background
+var board = JXG.JSXGraph.initBoard('jxgbox2', {boundingbox: [-1, 11, 22, -1]});
+board.unsuspendUpdate();
+//  var p = board.create('point',[1,1]);
+
+// create the helping lines
+//var hline1 = board.create('line',[[0,0],[21,0]], {strokeColor:'Black'});
+var hline2 = board.create('line',[[0,3],[8,3]], { straightLast:false, strokeWidth:1, dash:2, strokeColor:'Gray'});
+var hline3 = board.create('line',[[0,6],[8,6]], { straightLast:false, strokeWidth:1, dash:2, strokeColor:'Gray'});
+var hline4 = board.create('line',[[0,9],[8,9]], { strokeWidth:2,  strokeColor:'Gray'});
+var hline5 = board.create('line',[[14,6],[21,6]], {straightFirst:false, strokeWidth:1, dash:2, strokeColor:'Gray'});
+var hline6 = board.create('line',[[14,3],[21,3]], {straightFirst:false, strokeWidth:1, dash:2, strokeColor:'Gray'});
+//var vline1 = board.create('line',[[0,0],[0,10]], {strokeColor:'Black'});
+var vline2 = board.create('line',[[2.5,0],[2.5,10]], { strokeWidth:1, dash:2, strokeColor:'Gray'});
+var vline3 = board.create('line',[[5,0],[5,10]],{ strokeWidth:1, dash:2, strokeColor:'Gray'});
+var vline4 = board.create('line',[[8,0],[8,10]], { strokeWidth:1, dash:2, strokeColor:'Gray'});
+var vline5 = board.create('line',[[14,0],[14,10]], { strokeWidth:1, dash:2, strokeColor:'Gray'});
+var vline4 = board.create('line',[[17,0],[17,10]], { strokeWidth:1, dash:2, strokeColor:'Gray'});
+//var vline4 = board.create('line',[[21,0],[21,10]], {strokeColor:'Black'});
+
+//from top to down is channel 1 2 3
+
+// //base vector 
+// var base1 = [1/4, 1/4, 1/4, 1/4];
+// var base2 = [1/4, 1/4, -1/4, -1/4];
+// var base3 = [1/4, -1/4, -1/4, 1/4];
+
+function base10(){ return Number(document.getElementById('channel_11').value);}
+document.getElementById('channel_11').addEventListener('change', function() {
+        board.update();
+});
+
+function base11(){ return Number(document.getElementById('channel_12').value);}
+document.getElementById('channel_12').addEventListener('change', function() {
+        board.update();
+});
+function base12(){ return Number(document.getElementById('channel_13').value);}
+document.getElementById('channel_13').addEventListener('change', function() {
+        board.update();
+});
+function base13(){ return Number(document.getElementById('channel_14').value);}
+document.getElementById('channel_14').addEventListener('change', function() {
+        board.update();
+});
+function base20(){ return Number(document.getElementById('channel_21').value);}
+document.getElementById('channel_21').addEventListener('change', function() {
+        board.update();
+});
+
+function base21(){ return Number(document.getElementById('channel_22').value);}
+document.getElementById('channel_22').addEventListener('change', function() {
+        board.update();
+});
+function base22(){ return Number(document.getElementById('channel_23').value);}
+document.getElementById('channel_23').addEventListener('change', function() {
+        board.update();
+});
+function base23(){ return Number(document.getElementById('channel_24').value);}
+document.getElementById('channel_24').addEventListener('change', function() {
+        board.update();
+});
+function base30(){ return Number(document.getElementById('channel_31').value);}
+document.getElementById('channel_31').addEventListener('change', function() {
+        board.update();
+});
+
+function base31(){ return Number(document.getElementById('channel_32').value);}
+document.getElementById('channel_32').addEventListener('change', function() {
+        board.update();
+});
+function base32(){ return Number(document.getElementById('channel_33').value);}
+document.getElementById('channel_33').addEventListener('change', function() {
+        board.update();
+});
+function base33(){ return Number(document.getElementById('channel_34').value);}
+document.getElementById('channel_34').addEventListener('change', function() {
+        board.update();
+});
+// document.getElementById('channel_12').value = base11();
+// document.getElementById('channel_13').value = base12();
+// document.getElementById('channel_14').value = base13();
+
+
+var base1 = [base10(), base11(), base12(), base13()];
+var base2 = [base20(), base21(), base22(), base23()];
+var base3 = [base30(), base31(), base32(), base33()];
+
+
+//input 
+var input3 = board.create('slider',[[3,2],[4,2],[0,0,1]],{snapWidth:1});
+var input2 = board.create('slider',[[3,5],[4,5],[0,0,1]],{snapWidth:1});
+var input1 = board.create('slider',[[3,8],[4,8],[0,0,1]],{snapWidth:1});
+
+//plot the encoded signal
+
+
+//channel 1
+var encode1_0 = board.create('line',[[5.25,7.5],[7.75,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_v11 = board.create('line',[[5.5,function(){return 7.5+(2*input1.Value()-1)*base10()}],[5.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_v12 = board.create('line',[[6.0,function(){return 7.5+(2*input1.Value()-1)*base10()}],[6.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_h1 = board.create('line',[[5.5,function(){return 7.5+(2*input1.Value()-1)*base10()}],[6.0,function(){return 7.5+(2*input1.Value()-1)*base10()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode1_v21 = board.create('line',[[6.0,function(){return 7.5+(2*input1.Value()-1)*base11()}],[6.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_v22 = board.create('line',[[6.5,function(){return 7.5+(2*input1.Value()-1)*base11()}],[6.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_h2 = board.create('line',[[6.0,function(){return 7.5+(2*input1.Value()-1)*base11()}],[6.5,function(){return 7.5+(2*input1.Value()-1)*base11()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode1_v31 = board.create('line',[[6.5,function(){return 7.5+(2*input1.Value()-1)*base12()}],[6.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_v32 = board.create('line',[[7.0,function(){return 7.5+(2*input1.Value()-1)*base12()}],[7.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_h3 = board.create('line',[[6.5,function(){return 7.5+(2*input1.Value()-1)*base12()}],[7.0,function(){return 7.5+(2*input1.Value()-1)*base12()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode1_v41 = board.create('line',[[7.0,function(){return 7.5+(2*input1.Value()-1)*base13()}],[7.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_v42 = board.create('line',[[7.5,function(){return 7.5+(2*input1.Value()-1)*base13()}],[7.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode1_h4 = board.create('line',[[7.0,function(){return 7.5+(2*input1.Value()-1)*base13()}],[7.5,function(){return 7.5+(2*input1.Value()-1)*base13()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+//channel 2
+var encode2_0 = board.create('line',[[5.25,4.5],[7.75,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_v11 = board.create('line',[[5.5,function(){return 4.5+(2*input2.Value()-1)*base20()}],[5.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_v12 = board.create('line',[[6.0,function(){return 4.5+(2*input2.Value()-1)*base20()}],[6.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_h1 = board.create('line',[[5.5,function(){return 4.5+(2*input2.Value()-1)*base20()}],[6.0,function(){return 4.5+(2*input2.Value()-1)*base20()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode2_v21 = board.create('line',[[6.0,function(){return 4.5+(2*input2.Value()-1)*base21()}],[6.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_v22 = board.create('line',[[6.5,function(){return 4.5+(2*input2.Value()-1)*base21()}],[6.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_h2 = board.create('line',[[6.0,function(){return 4.5+(2*input2.Value()-1)*base21()}],[6.5,function(){return 4.5+(2*input2.Value()-1)*base21()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode2_v31 = board.create('line',[[6.5,function(){return 4.5+(2*input2.Value()-1)*base22()}],[6.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_v32 = board.create('line',[[7.0,function(){return 4.5+(2*input2.Value()-1)*base22()}],[7.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_h3 = board.create('line',[[6.5,function(){return 4.5+(2*input2.Value()-1)*base22()}],[7.0,function(){return 4.5+(2*input2.Value()-1)*base22()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode2_v41 = board.create('line',[[7.0,function(){return 4.5+(2*input2.Value()-1)*base23()}],[7.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_v42 = board.create('line',[[7.5,function(){return 4.5+(2*input2.Value()-1)*base23()}],[7.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode2_h4 = board.create('line',[[7.0,function(){return 4.5+(2*input2.Value()-1)*base23()}],[7.5,function(){return 4.5+(2*input2.Value()-1)*base23()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+//channel 3
+var encode3_0 = board.create('line',[[5.25,1.5],[7.75,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_v11 = board.create('line',[[5.5,function(){return 1.5+(2*input3.Value()-1)*base30()}],[5.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_v12 = board.create('line',[[6.0,function(){return 1.5+(2*input3.Value()-1)*base30()}],[6.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_h1 = board.create('line',[[5.5,function(){return 1.5+(2*input3.Value()-1)*base30()}],[6.0,function(){return 1.5+(2*input3.Value()-1)*base30()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode3_v21 = board.create('line',[[6.0,function(){return 1.5+(2*input3.Value()-1)*base31()}],[6.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_v22 = board.create('line',[[6.5,function(){return 1.5+(2*input3.Value()-1)*base31()}],[6.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_h2 = board.create('line',[[6.0,function(){return 1.5+(2*input3.Value()-1)*base31()}],[6.5,function(){return 1.5+(2*input3.Value()-1)*base31()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode3_v31 = board.create('line',[[6.5,function(){return 1.5+(2*input3.Value()-1)*base32()}],[6.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_v32 = board.create('line',[[7.0,function(){return 1.5+(2*input3.Value()-1)*base32()}],[7.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_h3 = board.create('line',[[6.5,function(){return 1.5+(2*input3.Value()-1)*base32()}],[7.0,function(){return 1.5+(2*input3.Value()-1)*base32()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var encode3_v41 = board.create('line',[[7.0,function(){return 1.5+(2*input3.Value()-1)*base33()}],[7.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_v42 = board.create('line',[[7.5,function(){return 1.5+(2*input3.Value()-1)*base33()}],[7.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var encode3_h4 = board.create('line',[[7.0,function(){return 1.5+(2*input3.Value()-1)*base33()}],[7.5,function(){return 1.5+(2*input3.Value()-1)*base33()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+//the sum signal
+// var sum_signal = [function(){return (2*input1.Value()-1)*base1[0]+(2*input2.Value()-1)*base20()+(2*input3.Value()-1)*base30()},
+//                 function(){return (2*input1.Value()-1)*base11()+(2*input2.Value()-1)*base21()+(2*input3.Value()-1)*base31()},
+//                 function(){return (2*input1.Value()-1)*base12()+(2*input2.Value()-1)*base22()+(2*input3.Value()-1)*base32()},
+//                 function(){return (2*input1.Value()-1)*base13()+(2*input2.Value()-1)*base23()+(2*input3.Value()-1)*base33()}];
+
+function sum_signal_0(){return (2*input1.Value()-1)*base10()+(2*input2.Value()-1)*base20()+(2*input3.Value()-1)*base30()};
+function sum_signal_1(){return (2*input1.Value()-1)*base11()+(2*input2.Value()-1)*base21()+(2*input3.Value()-1)*base31()};
+function sum_signal_2(){return (2*input1.Value()-1)*base12()+(2*input2.Value()-1)*base22()+(2*input3.Value()-1)*base32()};
+function sum_signal_3(){return (2*input1.Value()-1)*base13()+(2*input2.Value()-1)*base23()+(2*input3.Value()-1)*base33()};
+
+        
+//plot the arrow and sum symbols
+var trans_1 = board.create('arrow',[[8.0,7.5],[8.5,4.5]],{strokeColor:'Orange',strokeWidth:1.5});
+var trans_2 = board.create('arrow',[[8.0,4.5],[8.5,4.5]],{strokeColor:'Orange',strokeWidth:1.5});
+var trans_3 = board.create('arrow',[[8.0,1.5],[8.5,4.5]],{strokeColor:'Orange',strokeWidth:1.5});
+var circle = board.create('circle',[[8.75,4.5],[8.5,4.5]],{strokeColor:'Orange'});
+var plus_1 = board.create('line', [[8.625,4.5],[8.875,4.5]], {straightFirst:false, straightLast:false,strokeColor:'Orange',strokeWidth:1.5});
+var plus_2 = board.create('line', [[8.75,4.625],[8.75,4.375]], {straightFirst:false, straightLast:false,strokeColor:'Orange',strokeWidth:1.5});
+var trans_4 = board.create('arrow',[[9.0,4.5],[9.5,4.5]],{strokeColor:'Orange',strokeWidth:1.5});
+var trans_5 = board.create('arrow',[[12.5,4.5],[13.5,4.5]],{strokeColor:'Orange',strokeWidth:1.5});
+
+//plot the sum at 9.5~12.5 len=2.5
+var sum_0 = board.create('line',[[9.75,4.5],[12.25,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_v11 = board.create('line',[[10.0,function(){return 4.5+sum_signal_0()}],[10.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_v12 = board.create('line',[[10.5,function(){return 4.5+sum_signal_0()}],[10.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_h1 = board.create('line',[[10.0,function(){return 4.5+sum_signal_0()}],[10.5,function(){return 4.5+sum_signal_0()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var sum_v21 = board.create('line',[[10.5,function(){return 4.5+sum_signal_1()}],[10.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_v22 = board.create('line',[[11.0,function(){return 4.5+sum_signal_1()}],[11.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_h2 = board.create('line',[[10.5,function(){return 4.5+sum_signal_1()}],[11.0,function(){return 4.5+sum_signal_1()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var sum_v31 = board.create('line',[[11.0,function(){return 4.5+sum_signal_2()}],[11.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_v32 = board.create('line',[[11.5,function(){return 4.5+sum_signal_2()}],[11.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_h3 = board.create('line',[[11.0,function(){return 4.5+sum_signal_2()}],[11.5,function(){return 4.5+sum_signal_2()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var sum_v31 = board.create('line',[[11.5,function(){return 4.5+sum_signal_3()}],[11.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_v32 = board.create('line',[[12.0,function(){return 4.5+sum_signal_3()}],[12.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var sum_h3 = board.create('line',[[11.5,function(){return 4.5+sum_signal_3()}],[12.0,function(){return 4.5+sum_signal_3()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+//plot the decode
+
+//channel 1
+var decode1_0 = board.create('line',[[14.25,7.5],[16.75,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_v11 = board.create('line',[[14.5,function(){return 7.5+(sum_signal_0())*base10()}],[14.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_v12 = board.create('line',[[15.0,function(){return 7.5+(sum_signal_0())*base10()}],[15.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_h1 = board.create('line',[[14.5,function(){return 7.5+(sum_signal_0())*base10()}],[15.0,function(){return 7.5+(sum_signal_0())*base10()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode1_v21 = board.create('line',[[15.0,function(){return 7.5+(sum_signal_1())*base11()}],[15.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_v22 = board.create('line',[[15.5,function(){return 7.5+(sum_signal_1())*base11()}],[15.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_h2 = board.create('line',[[15.0,function(){return 7.5+(sum_signal_1())*base11()}],[15.5,function(){return 7.5+(sum_signal_1())*base11()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode1_v31 = board.create('line',[[15.5,function(){return 7.5+(sum_signal_2())*base12()}],[15.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_v32 = board.create('line',[[16.0,function(){return 7.5+(sum_signal_2())*base12()}],[16.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_h3 = board.create('line',[[15.5,function(){return 7.5+(sum_signal_2())*base12()}],[16.0,function(){return 7.5+(sum_signal_2())*base12()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode1_v41 = board.create('line',[[16.0,function(){return 7.5+(sum_signal_3())*base13()}],[16.0,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_v42 = board.create('line',[[16.5,function(){return 7.5+(sum_signal_3())*base13()}],[16.5,7.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode1_h4 = board.create('line',[[16.0,function(){return 7.5+(sum_signal_3())*base13()}],[16.5,function(){return 7.5+(sum_signal_3())*base13()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+//channel 2
+var decode2_0 = board.create('line',[[14.25,4.5],[16.75,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_v11 = board.create('line',[[14.5,function(){return 4.5+(sum_signal_0())*base20()}],[14.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_v12 = board.create('line',[[15.0,function(){return 4.5+(sum_signal_0())*base20()}],[15.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_h1 = board.create('line',[[14.5,function(){return 4.5+(sum_signal_0())*base20()}],[15.0,function(){return 4.5+(sum_signal_0())*base20()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode2_v21 = board.create('line',[[15.0,function(){return 4.5+(sum_signal_1())*base21()}],[15.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_v22 = board.create('line',[[15.5,function(){return 4.5+(sum_signal_1())*base21()}],[15.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_h2 = board.create('line',[[15.0,function(){return 4.5+(sum_signal_1())*base21()}],[15.5,function(){return 4.5+(sum_signal_1())*base21()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode2_v31 = board.create('line',[[15.5,function(){return 4.5+(sum_signal_2())*base22()}],[15.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_v32 = board.create('line',[[16.0,function(){return 4.5+(sum_signal_2())*base22()}],[16.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_h3 = board.create('line',[[15.5,function(){return 4.5+(sum_signal_2())*base22()}],[16.0,function(){return 4.5+(sum_signal_2())*base22()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode2_v41 = board.create('line',[[16.0,function(){return 4.5+(sum_signal_3())*base23()}],[16.0,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_v42 = board.create('line',[[16.5,function(){return 4.5+(sum_signal_3())*base23()}],[16.5,4.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode2_h4 = board.create('line',[[16.0,function(){return 4.5+(sum_signal_3())*base23()}],[16.5,function(){return 4.5+(sum_signal_3())*base23()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+//channel 3
+var decode3_0 = board.create('line',[[14.25,1.5],[16.75,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_v11 = board.create('line',[[14.5,function(){return 1.5+(sum_signal_0())*base30()}],[14.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_v12 = board.create('line',[[15.0,function(){return 1.5+(sum_signal_0())*base30()}],[15.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_h1 = board.create('line',[[14.5,function(){return 1.5+(sum_signal_0())*base30()}],[15.0,function(){return 1.5+(sum_signal_0())*base30()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode3_v21 = board.create('line',[[15.0,function(){return 1.5+(sum_signal_1())*base31()}],[15.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_v22 = board.create('line',[[15.5,function(){return 1.5+(sum_signal_1())*base31()}],[15.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_h2 = board.create('line',[[15.0,function(){return 1.5+(sum_signal_1())*base31()}],[15.5,function(){return 1.5+(sum_signal_1())*base31()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode3_v31 = board.create('line',[[15.5,function(){return 1.5+(sum_signal_2())*base32()}],[15.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_v32 = board.create('line',[[16.0,function(){return 1.5+(sum_signal_2())*base32()}],[16.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_h3 = board.create('line',[[15.5,function(){return 1.5+(sum_signal_2())*base32()}],[16.0,function(){return 1.5+(sum_signal_2())*base32()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+var decode3_v41 = board.create('line',[[16.0,function(){return 1.5+(sum_signal_3())*base33()}],[16.0,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_v42 = board.create('line',[[16.5,function(){return 1.5+(sum_signal_3())*base33()}],[16.5,1.5]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+var decode3_h4 = board.create('line',[[16.0,function(){return 1.5+(sum_signal_3())*base33()}],[16.5,function(){return 1.5+(sum_signal_3())*base33()}]],{straightFirst:false, straightLast:false,strokeColor:'Black',strokeWidth:2});
+
+
+//output
+var out_text11 = board.create('text',[17.25,8,
+        function(){return sum_signal_0()*base10() + " + (" + sum_signal_1()*base11() + ") + (" + sum_signal_2()*base12() + ") + (" + sum_signal_3()*base13() + ")";}
+        ], {fontSize:15});
+var out_text12 = board.create('text',[17.25,7,
+        function(){return " = " + (sum_signal_0()*base10()+sum_signal_1()*base11()+sum_signal_2()*base12()+sum_signal_3()*base13());}], {fontSize:20});
+
+var out_text21 = board.create('text',[17.25,5,
+        function(){return sum_signal_0()*base20() + " + (" + sum_signal_1()*base21() + ") + (" + sum_signal_2()*base22() + ") + (" + sum_signal_3()*base23() + ")";}
+        ], {fontSize:15});
+var out_text22 = board.create('text',[17.25,4,
+        function(){return " = " + (sum_signal_0()*base20()+sum_signal_1()*base21()+sum_signal_2()*base22()+sum_signal_3()*base23()) ;}], {fontSize:20});
+
+var out_text31 = board.create('text',[17.25,2,
+        function(){return sum_signal_0()*base30() + " + (" + sum_signal_1()*base31() + ") + (" + sum_signal_2()*base32() + ") + (" + sum_signal_3()*base33() + ")";}
+        ], {fontSize:15});
+var out_text32 = board.create('text',[17.25,1,
+        function(){return " = " + (sum_signal_0()*base30()+sum_signal_1()*base31()+sum_signal_2()*base32()+sum_signal_3()*base33());}], {fontSize:20});
+
+//channel base
+var chanel_t1 = board.create('text', [0.35,7.65,function(){return " \\[\\left(\\begin{matrix}" + base10()  +"\\\\"+ base11() +"\\\\"+ base12() +"\\\\"+ base13()+ "\\end{matrix}\\right)\\]";}], {frontSize:20});
+var chanel_t2 = board.create('text', [0.35,4.65,function(){return " \\[\\left(\\begin{matrix}" + base20() +"\\\\"+ base21() +"\\\\" + base22()+"\\\\"+ base23()+ "\\end{matrix}\\right)\\]";}], {frontSize:20});
+var chanel_t3 = board.create('text', [0.35,1.65,function(){return " \\[\\left(\\begin{matrix}" +  base30() +"\\\\"+ base31() +"\\\\" + base32()+"\\\\"+ base33()+ "\\end{matrix}\\right)\\]";}], {frontSize:20});
+
+
+//the texts in the graph
+var t1 = board.create('text',[-0.25, 9.5, "Channel Code"], {fontSize:18});
+// var tc1 = board.create('text',[-0.1, 8.7,"Initial: "], {fontSize:18, strokeColor:"Orange"});
+// var tc2 = board.create('text',[-0.1, 5.7,"Initial: "], {fontSize:18, strokeColor:"Orange"});
+// var tc3 = board.create('text',[-0.1, 2.7,"Initial: "], {fontSize:18, strokeColor:"Orange"});
+var t2 = board.create('text',[2.75,9.5,"Input"],{fontSize:18});
+var t3 = board.create('text',[5.25,9.5,"Encode"],{fontSize:18});
+var t4 = board.create('text',[8.25,9.5,"Multiplexing/ Transmission"],{fontSize:18});
+var t5 = board.create('text',[14.25,9.5,"Decode"],{fontSize:18});
+var t6 = board.create('text',[17.25,9.5,"Recover"],{fontSize:18});
+var t7 = board.create('text',[12.4, 5.5,"Transmit"],{fontSize:15, strokeColor:'Orange'});
+
+var i1 = board.create('text',[3,1,"0 -> -1"], {fontSize:15, strokeColor:'Red'});
+var i2 = board.create('text',[3,0.5,"1 -> 1"],{fontSize:15, strokeColor:'Red'});
+var i3 = board.create('text',[3,4,"0 -> -1"], {fontSize:15, strokeColor:'Red'});
+var i4 = board.create('text',[3,3.5,"1 -> 1"],{fontSize:15, strokeColor:'Red'});
+var i5 = board.create('text',[3,7,"0 -> -1"], {fontSize:15, strokeColor:'Red'});
+var i6 = board.create('text',[3,6.5,"1 -> 1"],{fontSize:15, strokeColor:'Red'});
+
+// board.unsuspendUpdate();
+// showTrace = false;
+// var toggleTrace = function() {
+// showTrace = !showTrace;
+// input1.setProperty({trace: showTrace});
+// input2.setProperty({trace: showTrace});
+// input3.setProperty({trace: showTrace});
+// // sum_signal.setProperty({trace: showTrace});
+// //v2.setProperty({trace: showTrace});
+// var b = document.getElementById("toggleButton");
+// if (showTrace) {
+//    b.value = "Hide trace";
+// } else {
+//    b.value = "Show trace";
+//    input1.clearTrace();
+//    input2.clearTrace();
+//    input3.clearTrace();
+// //    sum_signal.clearTrace();
+//   // v2.clearTrace();
+// }
+// };
+
+
+</script>
+
+<p>Do you see that we can successfully recover for each input message combination? Here we use the math equation to show the reason.</p>
+<center><p>Assuming $c_j$ is message, and $a_j$ are channel code in the $j$-th station. $a_j*(\sum c_i*a_i) = \sum c_i a_i a_j = c_i$.</p></center>
+<p>This is exactly the same as the orthogonal projection property! This indicates that the CDMA system will work for whatever orthogonal basis. 
+        In the above interactive graph, change the channel code to see how it influences the system.</p>
+
+<p>If we adjust the orthogonal basis by a little, it will break the orthogonal property, but it seems the system still works. This is because our input has only -1 and 1, so there's a fault-tolerant. 
+        This fact protects the system from real-world distraction, since we can regularize all negative value to output 0 and all positive value to ouput 1.
+</p>
+
+</body>
+</html>
